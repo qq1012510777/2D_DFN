@@ -14,17 +14,20 @@ addpath(genpath([currentPath, '/Plot_DFN']));
 addpath(genpath([currentPath, '/Geometry']));
 addpath(genpath([currentPath, '/Mesh']));
 addpath(genpath([currentPath, '/Solve']));
+addpath(genpath([currentPath, '/Solute_tranposrt']));
 % including the self-defined functions
 
-NUM_fracs = 150; % number of fractures
-domain_size = 20;
-len = 10;
+NUM_fracs = 60; % number of fractures
+domain_size = 40;
+len = 30;
 
 % set a domain % it is a rectangle
 [Dom Domain_coordinates Bound_] = Domain(domain_size);
 
 % add fractures
 Frac = Fractures(Dom, NUM_fracs, len);
+% S_ = load([currentPath, '/inp_fractures/Fractures.mat']);
+% Frac = Import_fractures(S_);
 
 % now let us visualize the DFN!
 % please extract fracture attributes first
@@ -81,6 +84,8 @@ if (size(Percoalting_cluster, 2) > 0)
     figure(5); title('Percolating_cluster'); xlabel('x(m)'); ylabel('y(m)'); hold on
     f = Plot_DFN_percolating_clusters(Domain_coordinates, Cluster_, Frac, Percoalting_cluster);
 end
+% -----remove dead end fractures----
+% updating
 
 %------- output
 Lines_ = [];

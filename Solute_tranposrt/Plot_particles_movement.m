@@ -1,4 +1,4 @@
-function f = Plot_pressure_field(JXY, JM, Pressure, Dom)
+function f = Plot_particles_movement(JXY, JM, Pressure, Dom, location_particles, timestep)
     %[X, Y] = meshgrid(Dom.x_min:(Dom.x_max - Dom.x_min) / 100:Dom.x_max, ...
     %    Dom.y_min:(Dom.y_max - Dom.y_min) / 100:Dom.y_max);
     %
@@ -23,7 +23,27 @@ function f = Plot_pressure_field(JXY, JM, Pressure, Dom)
         surface([x; x], [y; y], [z; z], [col; col], ...
             'facecol', 'no', ...
             'edgecol', 'interp', ...
-            'linew', 4); hold on;
+            'linew', 1); hold on;
     end
+
     colorbar; hold on
+
+    GGI = zeros(timestep, 2 * size(location_particles, 2));
+
+    for i = 1:size(location_particles, 2)
+        GGI(:, i) = location_particles(i).location(:, 1);
+        GGI(:, i + size(location_particles, 2)) = location_particles(i).location(:, 2);
+    end
+
+    ph = scatter(GGI(1, [1:size(location_particles, 2)]), GGI(1, [size(location_particles, 2) + 1:end]), 'k', 'o', 'filled');
+    pause(0.05)
+
+    for i = 2:timestep
+        ph.XData = GGI(i, [1:size(location_particles, 2)]);      %change x coordinate of the point
+        ph.YData = GGI(i, [size(location_particles, 2) + 1:end]); %change y coordinate of the point
+        drawnow
+        pause(0.05) %control speed, if desired
+    end
+
+    f = 0;
 end

@@ -1,4 +1,4 @@
-function f = Solve_DFN_flow(JXY, JM, Dom, conductivity, htop, hbot)
+function [f top_ele bot_ele] = Solve_DFN_flow(JXY, JM, Dom, conductivity, htop, hbot)
     Dim_ = size(JXY, 1);
 
     K = sparse(Dim_, Dim_);
@@ -6,8 +6,8 @@ function f = Solve_DFN_flow(JXY, JM, Dom, conductivity, htop, hbot)
 
     Top_nodes = [];
     Bot_nodes = [];
-    Left_nodes = [];
-    Right_nodes = [];
+
+    top_ele = []; bot_ele = [];
 
     for i = 1:size(JM, 1)
 
@@ -24,12 +24,12 @@ function f = Solve_DFN_flow(JXY, JM, Dom, conductivity, htop, hbot)
 
             if (coord(2) == Dom.y_max)
                 Top_nodes = [Top_nodes, ID1];
-            elseif (coord(2) == Dom.y_min)
+                top_ele = [top_ele, i];
+            end
+
+            if (coord(2) == Dom.y_min)
                 Bot_nodes = [Bot_nodes, ID1];
-            elseif (coord(1) == Dom.x_min)
-                Left_nodes = [Left_nodes, ID1];
-            elseif (coord(1) == Dom.x_max)
-                Right_nodes = [Right_nodes, ID1];
+                bot_ele = [bot_ele, i];
             end
 
         end
@@ -63,6 +63,7 @@ function f = Solve_DFN_flow(JXY, JM, Dom, conductivity, htop, hbot)
 
         b(ID, 1) = hbot;
     end
+
     % full(K)
     % full(b)
     f = inv(K) * b;
