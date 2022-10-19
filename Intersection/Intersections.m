@@ -1,7 +1,7 @@
 function f = Intersections(Frac, string_i)
     Intersections(1) = struct('frac1_tag', 0, ...
         'frac2_tag', 0, ...
-        'intersection', [0, 0]); % initialize a vector of structs to story the intersection point and the tags of the two fractures
+        'intersection', [NaN, NaN]); % initialize a vector of structs to story the intersection point and the tags of the two fractures
 
     currentPath3 = fileparts(mfilename('fullpath'));
     addpath(genpath([currentPath3, '/Line_intersection']));
@@ -17,10 +17,10 @@ function f = Intersections(Frac, string_i)
         for j = i + 1:1:NUM_fracs
 
             if (string_i == "truncated")
-                A = [A, [Frac(i).ends_x(1); Frac(i).truncated_ends_y(1)]];
-                B = [B, [Frac(i).ends_x(2); Frac(i).truncated_ends_y(2)]];
-                C = [C, [Frac(j).ends_x(1); Frac(j).truncated_ends_y(1)]];
-                D = [D, [Frac(j).ends_x(2); Frac(j).truncated_ends_y(2)]];
+                A = [A, [Frac(i).truncated_ends_x(1); Frac(i).truncated_ends_y(1)]];
+                B = [B, [Frac(i).truncated_ends_x(2); Frac(i).truncated_ends_y(2)]];
+                C = [C, [Frac(j).truncated_ends_x(1); Frac(j).truncated_ends_y(1)]];
+                D = [D, [Frac(j).truncated_ends_x(2); Frac(j).truncated_ends_y(2)]];
             else
                 A = [A, [Frac(i).ends_x(1); Frac(i).ends_y(1)]];
                 B = [B, [Frac(i).ends_x(2); Frac(i).ends_y(2)]];

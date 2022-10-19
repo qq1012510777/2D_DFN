@@ -1,22 +1,22 @@
 load([currentPath, '/mesh_2D.mat']);
 
-% figure(6); % subplot(1, 3, 1);
-% title('DFN mesh'); xlabel('x(m)'); ylabel('y(m)'); hold on
-% Show_DFN_mesh(JXY_2D, JM_2D, 0, Dom);
+figure(6); % subplot(1, 3, 1);
+title('DFN mesh'); xlabel('x(m)'); ylabel('y(m)'); hold on
+Show_DFN_mesh(JXY_2D, JM_2D, 0, Dom);
 
-[pressure top_ele bot_ele] = Solve_DFN_flow(JXY_2D, JM_2D, Dom, 1, 500, 20);
+[pressure top_ele bot_ele] = Solve_DFN_flow(JXY_2D, JM_2D, Dom, (1.0e-3)^3.0 / 12.0, 100, 20);
 
-% figure(7); % subplot(1, 3, 2);
-% title('DFN pressure field'); xlabel('x(m)'); ylabel('y(m)'); hold on
-% Plot_pressure_field(JXY_2D, JM_2D, pressure, Dom);
+figure(7); % subplot(1, 3, 2);
+title('DFN pressure field'); xlabel('x(m)'); ylabel('y(m)'); hold on
+Plot_pressure_field(JXY_2D, JM_2D, pressure, Dom);
 
-[inlet, outlet] = Inlet_Outlet_flux(pressure, top_ele, bot_ele, JM_2D, JXY_2D, 1)
+[inlet, outlet] = Inlet_Outlet_flux(pressure, top_ele, bot_ele, JM_2D, JXY_2D, (1.0e-3)^3.0 / 12.0)
 
-% figure(8); % subplot(1, 3, 3);
-% title('DFN flux field'); xlabel('x(m)'); ylabel('y(m)'); hold on
-% Plot_flux_vec(pressure, JM_2D, JXY_2D, 1, Dom);
+figure(8); % subplot(1, 3, 3);
+title('DFN flux field'); xlabel('x(m)'); ylabel('y(m)'); hold on
+Plot_flux_vec(pressure, JM_2D, JXY_2D, 1, Dom);
 
-[node_s, ele_s, num_particles_] = Inject_particles(Dom, JXY_2D, JM_2D, 50, 'even');
+[node_s, ele_s, num_particles_] = Inject_particles(Dom, JXY_2D, JM_2D, 500, 'even');
 target_ele = Identify_target_eles(JXY_2D, JM_2D, Dom);
 Adja_mat = sparse(size(JXY_2D, 1), size(JXY_2D, 1));
 
@@ -25,13 +25,13 @@ for i = 1:size(JM_2D, 1)
     Adja_mat(JM_2D(i, 2), JM_2D(i, 1)) = i;
 end
 
-time_step = 800;
+time_step = 5000;
 delta_t = 0.0025;
 
 location_particles(sum(num_particles_)) = struct("location", [0, 0]);
 
 Num = 0;
-
+return 
 for ik = 1:size(node_s, 1)
     %-----------------------------------
     for j = 1:num_particles_(ik)
@@ -73,5 +73,5 @@ for ik = 1:size(node_s, 1)
 end
 
 figure(9)
-title('DFN particles movements'); xlabel('x(m)'); ylabel('y(m)'); hold on
+% title('None'); xlabel('x(m)'); ylabel('y(m)'); hold on
 Plot_particles_movement(JXY_2D, JM_2D, pressure, Dom, location_particles, time_step);
