@@ -67,4 +67,5 @@ function [f top_ele bot_ele] = Solve_DFN_flow(JXY, JM, Dom, conductivity, htop, 
     % full(K)
     % full(b)
     f = inv(K) * b;
+    f = full(f);
 end

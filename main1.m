@@ -14,10 +14,11 @@ addpath(genpath([currentPath, '/Plot_DFN']));
 addpath(genpath([currentPath, '/Geometry']));
 addpath(genpath([currentPath, '/Mesh']));
 addpath(genpath([currentPath, '/Solve']));
-addpath(genpath([currentPath, '/Solute_tranposrt']));
+addpath(genpath([currentPath, '/Particle_Tracking']));
+
 % including the self-defined functions
 
-NUM_fracs = 2; % number of fractures
+NUM_fracs = 90; % number of fractures
 domain_size = 30;
 len = 30;
 
@@ -31,8 +32,7 @@ Frac = Fractures(Dom, NUM_fracs, len);
 % S_ = load([currentPath, '/inp_fractures/DFN_I.mat']);
 % S_ = h5read([currentPath, '/inp_fractures/DFN_I.h5'], '/verts');
 % K_ =S_;
-% Frac = Import_fractures_II(K_); 
-% NUM_fracs = size(Frac, 2);
+% Frac = Import_fractures_II(K_); NUM_fracs = size(Frac, 2);
 
 % now let us visualize the DFN!
 % please extract fracture attributes first
@@ -73,7 +73,7 @@ end
 
 Cluster_ = Cluster(s, t, NUM_fracs);
 figure(3); title('Connecting fractures'); xlabel('x(m)'); ylabel('y(m)'); hold on
-Plot_DFN_clusters(Domain_coordinates, Cluster_, Frac);
+Plot_DFN_clusters(Domain_coordinates, Cluster_, Frac, "N");
 
 %---------------------
 
