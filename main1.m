@@ -38,12 +38,14 @@ Frac = Fractures(Dom, NUM_fracs, len);
 % please extract fracture attributes first
 
 figure(1); title('A 2D DFN'); xlabel('x(m)'); ylabel('y(m)'); hold on
+pbaspect([1 1 1]);
 Plot_DFN(Domain_coordinates, Frac, "No");
 
 %f = Intersection_status(0,0,1,1,0,1,1,0,45,135,0.5,0.5,0.5,0.5)
 Intersections_ = Intersections(Frac, "NO");
 % now, visualize the fractures and intersections
 figure(2); title('Intersections'); xlabel('x(m)'); ylabel('y(m)'); hold on
+pbaspect([1 1 1]);
 Plot_DFN_intersections(Domain_coordinates, Frac, Intersections_, "No");
 
 %------------------------------------------------------------------------------
@@ -73,6 +75,7 @@ end
 
 Cluster_ = Cluster(s, t, NUM_fracs);
 figure(3); title('Connecting fractures'); xlabel('x(m)'); ylabel('y(m)'); hold on
+pbaspect([1 1 1]);
 Plot_DFN_clusters(Domain_coordinates, Cluster_, Frac, "N");
 
 %---------------------
@@ -81,29 +84,42 @@ Plot_DFN_clusters(Domain_coordinates, Cluster_, Frac, "N");
 Frac = Trim_fracs(Domain_coordinates, Frac, Bound_, Dom);
 figure(4); title('A truncated 2D DFN'); xlabel('x(m)'); ylabel('y(m)'); hold on
 Plot_DFN(Domain_coordinates, Frac, "truncated");
+xlim([-0.5 * domain_size, 0.5 * domain_size])
+ylim([-0.5 * domain_size, 0.5 * domain_size])
+pbaspect([1 1 1]);
 
 %-----identify percolating cluster
 Percoalting_cluster = Identify_percolating_cluster(Frac, Cluster_);
 
 if (size(Percoalting_cluster, 2) > 0)
-    figure(5); title('Percolating_cluster'); xlabel('x(m)'); ylabel('y(m)'); hold on
+    figure(5); title('Percolating cluster'); xlabel('x(m)'); ylabel('y(m)'); hold on
+    pbaspect([1 1 1]);
     f = Plot_DFN_percolating_clusters(Domain_coordinates, Cluster_, Frac, Percoalting_cluster);
 end
+
 % -----remove dead end fractures----
 % updating
 
 %------- output
 Lines_ = [];
+
 for i = 1:size(Percoalting_cluster, 2)
     clusterID = Percoalting_cluster(i);
 
     Lineii = [];
+
     for j = 1:size(Cluster_(clusterID).cluster, 1)
         FracID = Cluster_(clusterID).cluster(j);
-        
+
         Lineii = [Frac(FracID).truncated_ends_x(1), Frac(FracID).truncated_ends_y(1), Frac(FracID).truncated_ends_x(2), Frac(FracID).truncated_ends_y(2)];
         Lines_ = [Lines_; Lineii];
     end
+
 end
 
 save([currentPath, '/Lines.mat'], 'Lines_')
+
+save([currentPath, '/main1_data.mat'])
+
+commandstr = [string([currentPath, '/Gmsh_script/bin/main ', currentPath, '/Lines.mat ', currentPath])];
+system(commandstr);

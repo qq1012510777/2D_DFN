@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -19,10 +20,13 @@ void matread(const char *file, const char *field, std::vector<double> &v);
 vector<double> Transfer_Eigen_to_vector(MatrixXd A);
 void Matlab_command(string FileKey_m, string FileKey_mat);
 
-int main()
+int main(int argc, char *argv[])
 {
     std::vector<double> TMP;
-    matread("../../Lines.mat", "Lines_", TMP);
+
+    cout << "...... loading data from " << argv[1] << endl;
+
+    matread(argv[1], "Lines_", TMP);
 
     MatrixXd JXY = MatrixXd::Zero(TMP.size() / 4, 4);
 
@@ -102,7 +106,16 @@ int main()
     vector<double> JM_vec = Transfer_Eigen_to_vector(element_2D);
 
     MATLAB_DATA_API ML;
-    string ASd = "../../mesh_2D.mat";
+
+    std::string s;
+    std::stringstream ss;
+    ss << argv[2];
+    ss >> s;
+
+    string ASd = s + "/mesh_2D.mat";
+
+    cout << "...... outputing data to " << ASd << endl;
+
     ML.Write_mat(ASd, "w", JXY_vec.size(),
                  coordinate_2D.rows(), coordinate_2D.cols(),
                  JXY_vec, "JXY_2D");
@@ -200,7 +213,6 @@ void Matlab_command(string FileKey_m, string FileKey_mat)
     oss << "h5write([currentPath, '/eye_ball_mesh.h5'], '/tag', Tag_3D);\n";
     oss.close();
 }
-
 
 vector<double> Transfer_Eigen_to_vector(MatrixXf A)
 {

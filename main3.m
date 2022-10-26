@@ -1,30 +1,38 @@
 close all
-NumParticles = 10000;
+
+filename = "ParticleTrackingData_";
+filename = filename + datestr(clock);
+filename = regexprep(filename, ' ', '_');
+filename = [currentPath, '/data/', char(filename)];
+mkdir(filename)
+
+NumParticles = 1000;
 ParticlesArray = zeros(NumParticles, 5);
+
 [node_s, ele_s, num_particles_, ParticlesArray] = Inject_particles(Dom, JXY_2D, JM_2D, NumParticles, conductivity, pressure, ...
 "flux_weighted");
 NumParticles = sum(num_particles_);
 ParticlesArray(:, 1) = [1:1:NumParticles]';
 ParticlesArray(:, 5) = zeros(NumParticles, 1);
 
-target_ele = Identify_target_eles(JXY_2D, JM_2D, Dom);
-
 Adja_list = Adjacent_list(JM_2D, 6, size(JXY_2D, 1));
 
-time_step = 1000;
-delta_t_o = 1e9;
+time_step = 10;
+delta_t_o = 1e6;
 
 Adja_list_GPU = gpuArray(Adja_list);
 JM_GPU = gpuArray(JM_2D);
 JXY_GPU = gpuArray(JXY_2D);
 pressure_GPU = gpuArray(pressure);
-% target_ele_GPU = gpuArray();
+
 figure(9); % subplot(1, 3, 2);
 title('PT'); xlabel('x(m)'); ylabel('y(m)'); hold on
 Plot_pressure_field(JXY_2D, JM_2D, pressure, Dom); hold on
 s1 = scatter(ParticlesArray(:, 3), ParticlesArray(:, 4), 'o', 'k', 'filled');
+save([filename, '/ParticlePositionTimeStep_', num2str(0, '%010d'), '.mat'], 'ParticlesArray')
+
 pbaspect([1 1 1]);
-disp('press ENTER to continue')
+disp('press ENTER to continue ......')
 pause
 % particle tracking
 for i = 1:time_step
@@ -94,7 +102,7 @@ for i = 1:time_step
 
         ParticlesArray_GPU(ArrivedParticleID, 5) = 1;
         ParticlesArray_GPU(ArrivedParticleID, [3, 4]) = JXY_GPU(LowPressureEnd_GPU(ArrivedParticleID), :);
-        
+
         [bool_a, idx_b] = ismember(ArrivedParticleID, ParticleID_moves);
         ParticleID_moves(idx_b) = [];
 
@@ -113,8 +121,10 @@ for i = 1:time_step
     clear ParticlesArray_GPU ParticleID_moves
     delete(s1)
 
+    save([filename, '/ParticlePositionTimeStep_', num2str(i, '%010d'), '.mat'], 'ParticlesArray')
+
     figure(9)
     title(['PT, time step = ', num2str(i)]); hold on
     s1 = scatter(ParticlesArray(:, 3), ParticlesArray(:, 4), 'o', 'k', 'filled'); hold on
-    pause(0.1)
+    pause(0.2)
 end

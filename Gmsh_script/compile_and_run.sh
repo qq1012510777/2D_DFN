@@ -8,5 +8,4 @@ make
 cd ..
 cd bin
 echo "-----------------"
-./main
 cd ..

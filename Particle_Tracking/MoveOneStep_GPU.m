@@ -26,6 +26,7 @@ function [f1 f2 f3 f4 f5] = MoveOneStep_GPU(ParticleIDmoves, ParticlesArray_GPU,
     length_GPU = [vecnorm([JXY_GPU(node2_GPU, :) - JXY_GPU(node1_GPU, :)]')]';
     veclocity_GPU = abs(conductivity .* (pressure_GPU(node2_GPU, 1) - pressure_GPU(node1_GPU, 1)) ...
         ./ length_GPU);
+    veclocity_GPU = veclocity_GPU ./ ((conductivity * 12) ^ (1.0/3.0));
     d_x_GPU = veclocity_GPU .* delta_t;
     
     Dis_pre_Position_endNode_GPU = ...

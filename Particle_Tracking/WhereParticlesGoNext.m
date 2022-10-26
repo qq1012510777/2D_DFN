@@ -37,7 +37,7 @@ function [f1 f2] = WhereParticlesGoNext(ParticleID_moves, Adja_list_GPU, LowPres
     
     Local_Velocity_GPU(af) = 0;
     
-    TotalFlux = sum(Local_Velocity_GPU, 2);
+    TotalFlux = gpuArray(sum(Local_Velocity_GPU, 2));
     
     % Local_Velocity_GPU(af) = NaN;
     
@@ -49,28 +49,18 @@ function [f1 f2] = WhereParticlesGoNext(ParticleID_moves, Adja_list_GPU, LowPres
         end
     end
     
-    rand__ = rand(size(Local_Velocity_GPU, 1), 1);
+    rand__ = gpuArray(rand(size(Local_Velocity_GPU, 1), 1));
     
-    NextNode_GPU = zeros(size(Local_Velocity_GPU, 1), 1);
-    
-    for i = 1:size(rand__, 1)
-        for j = 1:size(Local_Velocity_GPU, 2)
-            if(rand__(i, 1) < Local_Velocity_GPU(i, j))
-                NextNode_GPU(i, 1) = LocalAdj_list_GPU(i, j + 1);
-                break
-            end
-            
-            if(j == size(Local_Velocity_GPU, 2))
-                error('Cannot find which element to go next 1')
-            end
-        end
-   
-    end
-    
-    if(sum(isnan(NextNode_GPU)) > 1)
+    NextNode_GPU = gpuArray(zeros(size(Local_Velocity_GPU, 1), 1));
+        
+    cond = bsxfun(@gt, Local_Velocity_GPU, rand__);
+    [ok, idx] = max(cond, [], 2);
+    cs = ok .* Local_Velocity_GPU((1:numel(idx))'+numel(idx)*(idx-1));
+    if(sum(ismember(0, cs)) > 1)
         error('Cannot find which element to go next 2')
     end
-    
+    NextNode_GPU = LocalAdj_list_GPU([1:1:size(LocalAdj_list_GPU, 1)]' + idx .* size(LocalAdj_list_GPU, 1));
+       
     [a, idx1] = ismember([LowPressureEnd_GPU(ParticleID_moves, 1), NextNode_GPU], JM_GPU, 'rows');
     [b, idx2] = ismember([NextNode_GPU, LowPressureEnd_GPU(ParticleID_moves, 1)], JM_GPU, 'rows');
     
